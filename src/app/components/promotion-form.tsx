@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Form, Formik } from 'formik';
+import { Form, Formik, FormikHelpers } from 'formik';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createPromotion, getCompany } from '@/lib/api';
 import Button from '@/app/components/button';
@@ -25,10 +25,7 @@ export interface PromotionFormProps {
   onSubmit?: (values: PromotionFieldValues) => void | Promise<void>;
 }
 
-export default function PromotionForm({
-  companyId,
-  onSubmit,
-}: PromotionFormProps) {
+const PromotionForm: React.FC<PromotionFormProps> = ({ companyId, onSubmit }) => {
   const queryClient = useQueryClient();
 
   const { data: company } = useQuery({
@@ -38,7 +35,7 @@ export default function PromotionForm({
     enabled: Boolean(companyId),
   });
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutateAsync, isLoading } = useMutation({
     mutationFn: createPromotion,
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -52,7 +49,10 @@ export default function PromotionForm({
     },
   });
 
-  const handleSubmit = async (values: PromotionFieldValues) => {
+  const handleSubmit = async (
+    values: PromotionFieldValues,
+    { resetForm }: FormikHelpers<PromotionFieldValues>
+  ) => {
     await mutateAsync({
       ...values,
       discount: Number(values.discount) || 0,
@@ -61,8 +61,10 @@ export default function PromotionForm({
     });
 
     if (onSubmit) {
-      onSubmit(values);
+      await onSubmit(values);
     }
+
+    resetForm();
   };
 
   return (
@@ -86,10 +88,12 @@ export default function PromotionForm({
           />
           <LogoUploader square label="Image" placeholder="Upload photo" />
         </div>
-        <Button type="submit" disabled={isPending}>
+        <Button type="submit" disabled={isLoading}>
           Add promotion
         </Button>
       </Form>
     </Formik>
   );
 }
+
+export default PromotionForm;
