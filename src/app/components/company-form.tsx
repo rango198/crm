@@ -1,14 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Form, Formik } from 'formik';
+import { Form, Formik, Field } from 'formik';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  CompanyStatus,
-  createCompany,
-  getCategories,
-  getCountries,
-} from '@/lib/api';
+import { CompanyStatus, createCompany, getCategories, getCountries } from '@/lib/api';
 import Button from '@/app/components/button';
 import InputField from '@/app/components/input-field';
 import LogoUploader from '@/app/components/logo-uploader';
@@ -81,50 +76,51 @@ export default function CompanyForm({ onSubmit }: CompanyFormProps) {
         <div className="flex gap-6">
           <div className="flex flex-col flex-1 gap-5">
             <LogoUploader label="Logo" placeholder="Upload photo" />
-            <InputField
+            <Field
               required
               label="Status"
               placeholder="Status"
               name="status"
               as="select"
+              component={InputField}
             >
-              {(Object.values(CompanyStatus) as CompanyStatus[]).map(
-                (status) => (
-                  <option key={status} value={status}>
-                    <StatusLabel status={status} styled={false} />
-                  </option>
-                ),
-              )}
-            </InputField>
-            <InputField
+              {(Object.values(CompanyStatus) as CompanyStatus[]).map((status) => (
+                <option key={status} value={status}>
+                  <StatusLabel status={status} styled={false} />
+                </option>
+              ))}
+            </Field>
+            <Field
               required
               label="Country"
               placeholder="Country"
               name="countryId"
               as="select"
+              component={InputField}
             >
               {countries?.map((country) => (
                 <option key={country.id} value={country.id}>
                   {country.title}
                 </option>
               ))}
-            </InputField>
+            </Field>
           </div>
           <div className="flex flex-col flex-1 gap-5">
             <InputField required label="Name" placeholder="Name" name="title" />
-            <InputField
+            <Field
               required
               label="Category"
               placeholder="Category"
               name="categoryId"
               as="select"
+              component={InputField}
             >
               {categories?.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.title}
                 </option>
               ))}
-            </InputField>
+            </Field>
             <InputField
               required
               label="Joined date"
