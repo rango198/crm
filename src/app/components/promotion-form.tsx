@@ -35,7 +35,7 @@ const PromotionForm: React.FC<PromotionFormProps> = ({ companyId, onSubmit }) =>
     enabled: Boolean(companyId),
   });
 
-  const { mutateAsync, isLoading } = useMutation({
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: createPromotion,
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -93,7 +93,7 @@ const PromotionForm: React.FC<PromotionFormProps> = ({ companyId, onSubmit }) =>
           />
           <LogoUploader square label="Image" placeholder="Upload photo" />
         </div>
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isPending}>
           Add promotion
         </Button>
       </Form>
