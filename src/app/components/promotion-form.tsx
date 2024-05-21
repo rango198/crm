@@ -35,7 +35,7 @@ const PromotionForm: React.FC<PromotionFormProps> = ({ companyId, onSubmit }) =>
     enabled: Boolean(companyId),
   });
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutateAsync, isLoading } = useMutation({
     mutationFn: createPromotion,
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -53,18 +53,23 @@ const PromotionForm: React.FC<PromotionFormProps> = ({ companyId, onSubmit }) =>
     values: PromotionFieldValues,
     { resetForm }: FormikHelpers<PromotionFieldValues>
   ) => {
-    await mutateAsync({
-      ...values,
-      discount: Number(values.discount) || 0,
-      companyId: company.id,
-      companyTitle: company.title,
-    });
+    if (company) { // Check if company data is loaded
+      await mutateAsync({
+        ...values,
+        discount: Number(values.discount) || 0,
+        companyId: company.id,
+        companyTitle: company.title,
+      });
 
-    if (onSubmit) {
-      await onSubmit(values);
+      if (onSubmit) {
+        await onSubmit(values);
+      }
+
+      resetForm();
+    } else {
+      // Handle the case where company data is not loaded
+      console.error("Company data is not loaded");
     }
-
-    resetForm();
   };
 
   return (
@@ -88,7 +93,7 @@ const PromotionForm: React.FC<PromotionFormProps> = ({ companyId, onSubmit }) =>
           />
           <LogoUploader square label="Image" placeholder="Upload photo" />
         </div>
-        <Button type="submit" disabled={isPending}>
+        <Button type="submit" disabled={isLoading}>
           Add promotion
         </Button>
       </Form>
